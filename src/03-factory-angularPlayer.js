@@ -174,24 +174,29 @@ ngSoundManager.factory('angularPlayer', ['$rootScope', '$log',
                     }
                 }
             },
+            //This has been modified to delete track from from playlist if it is already in the playlist
             addTrack: function(track) {
                 //check if track itself is valid and if its url is playable
                 if (!this.isTrackValid) {
                     return null;
                 }
 
-                //check if song already does not exists then add to playlist
+                //check if song already does not exists then add to play-list
+                //if it already exists, we remove the song from the play-list and then add it again in the new position
                 var inArrayKey = this.isInArray(this.getPlaylist(), track.id);
-                if(inArrayKey === false) {
-                    //$log.debug('song does not exists in playlist');
-                    //add to sound manager
-                    soundManager.createSound({
-                        id: track.id,
-                        url: track.url
-                    });
-                    //add to playlist
-                    this.addToPlaylist(track);
+                if(!(inArrayKey === false)) {
+                	this.removeSong(track.id, inArrayKey);
                 }
+                
+                //$log.debug('song does not exists in playlist');
+                //add to sound manager
+                soundManager.createSound({
+                    id: track.id,
+                    url: track.url
+                });
+                //add to playlist
+                this.addToPlaylist(track);
+
                 return track.id;
             },
             removeSong: function(song, index) {
